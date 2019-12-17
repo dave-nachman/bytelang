@@ -1,0 +1,96 @@
+use std::str::FromStr;
+use ast::{Expr, Operator, Value, Identifier};
+
+grammar;
+
+
+pub ExprOrStmt: Box<Expr> = {
+    Expr,
+    LetAssignment,
+    ConstAssignment,
+    Assignment
+};
+
+pub Expr: Box<Expr> = {
+    Expr ExprOp Factor => Box::new(Expr::BinaryOp(<>)),
+    Factor,
+    String
+};
+
+ExprOp: Operator = { // (3)
+    "+" => Operator::Add,
+    "-" => Operator::Sub,
+};
+
+Factor: Box<Expr> = {
+    Factor FactorOp Term => Box::new(Expr::BinaryOp(<>)),
+    Term,
+};
+
+FactorOp: Operator = {
+    "*" => Operator::Mul,
+    "/" => Operator::Div,
+};
+
+Term: Box<Expr> = {
+    <ident: Identifier> "(" <exprs: IdentifierExprUnboxed*> ")" => Box::new(Expr::CallFunction(ident, exprs)),
+    "(" <ids: Identifier*> ") => " <exprs: ExprOrStmtSep*>  => Box::new(Expr::Function(ids, exprs)),
+    Float => Box::new(Expr::Literal(Value::Float(<>))),
+    Int => Box::new(Expr::Literal(Value::Int(<>))),
+    True => Box::new(Expr::Literal(Value::Bool(true))),
+    False => Box::new(Expr::Literal(Value::Bool(false))),
+    IdentifierExpr,
+    "(" <Expr> ")"
+};
+
+ExprOrStmtSep: Expr = {
+    <expr: ExprOrStmt> ";" => *expr
+};
+
+Int: i32 = {
+    r"[0-9]+" => i32::from_str(<>).unwrap()
+};
+
+Float: f64 = {
+    r"\d+\.\d+" => f64::from_str(<>).unwrap()
+};
+
+True: bool = {
+    "true" => true
+};
+
+False: bool = {
+    "false" => false
+};
+
+String: Box<Expr>  = {
+    r#""[^"]+""# => Box::new(Expr::Literal(Value::String(String::from_str(<>).unwrap())))
+};
+
+LetAssignment: Box<Expr> = {
+    "let" <ident: Identifier> "=" <expr: Expr> => 
+        Box::new(Expr::LetAssignment(ident, expr))
+};
+
+ConstAssignment: Box<Expr> = {
+    "const" <ident: Identifier> "=" <expr: Expr> => 
+        Box::new(Expr::ConstAssignment(ident, expr))
+};
+
+Assignment: Box<Expr> = {
+    <ident: Identifier> "=" <expr: Expr> => 
+        Box::new(Expr::Assignment(ident, expr))
+};
+
+IdentifierExpr: Box<Expr>  = {
+    Identifier => Box::new(Expr::Identifier(<>))
+};
+
+IdentifierExprUnboxed: Expr  = {
+    Identifier => Expr::Identifier(<>)
+};
+
+
+Identifier: Identifier  = {
+    r"([A-Z]|[a-z])+" => Identifier::new(String::from_str(<>).unwrap())
+};
