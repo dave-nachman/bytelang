@@ -19,7 +19,6 @@ pub enum EvaluationResult {
     Success(ReturnValue),
 }
 
-
 impl Runtime {
     pub fn new() -> Runtime {
         Runtime::default()
@@ -66,50 +65,71 @@ impl Runtime {
 
 #[cfg(test)]
 mod tests {
-    use bytecode::Value;
     use super::*;
+    use bytecode::Value;
 
     #[test]
     fn test_int() {
         let mut runtime = Runtime::new();
-        assert_eq!(runtime.evaluate("3"), EvaluationResult::Success(ReturnValue::Value(Value::Int(3))));
+        assert_eq!(
+            runtime.evaluate("3"),
+            EvaluationResult::Success(ReturnValue::Value(Value::Int(3)))
+        );
     }
 
     #[test]
     fn test_float() {
         let mut runtime = Runtime::new();
-        assert_eq!(runtime.evaluate("3.0"), EvaluationResult::Success(ReturnValue::Value(Value::Float(3.0))));
+        assert_eq!(
+            runtime.evaluate("3.0"),
+            EvaluationResult::Success(ReturnValue::Value(Value::Float(3.0)))
+        );
     }
 
     #[test]
     fn test_bool() {
         let mut runtime = Runtime::new();
-        assert_eq!(runtime.evaluate("true"), EvaluationResult::Success(ReturnValue::Value(Value::Bool(true))));
+        assert_eq!(
+            runtime.evaluate("true"),
+            EvaluationResult::Success(ReturnValue::Value(Value::Bool(true)))
+        );
     }
 
     #[test]
     fn test_string() {
         let mut runtime = Runtime::new();
-        assert_eq!(runtime.evaluate("\"hello world\""), EvaluationResult::Success(ReturnValue::DisplayString("\"hello world\"".to_string())));
+        assert_eq!(
+            runtime.evaluate("\"hello world\""),
+            EvaluationResult::Success(ReturnValue::DisplayString("\"hello world\"".to_string()))
+        );
     }
 
     #[test]
     fn test_identifier_lookup() {
         let mut runtime = Runtime::new();
         let _ = runtime.evaluate("let x = 3");
-        assert_eq!(runtime.evaluate("x"), EvaluationResult::Success(ReturnValue::Value(Value::Int(3))));
+        assert_eq!(
+            runtime.evaluate("x"),
+            EvaluationResult::Success(ReturnValue::Value(Value::Int(3)))
+        );
     }
 
     #[test]
     fn test_addition() {
         let mut runtime = Runtime::new();
-        assert_eq!(runtime.evaluate("3 + 3"), EvaluationResult::Success(ReturnValue::Value(Value::Int(6))));
+        assert_eq!(
+            runtime.evaluate("3 + 3"),
+            EvaluationResult::Success(ReturnValue::Value(Value::Int(6)))
+        );
     }
 
     #[test]
     fn test_function() {
         let mut runtime = Runtime::new();
         let _ = runtime.evaluate("let x = () => 3;");
-        assert_eq!(runtime.evaluate("x()"), EvaluationResult::Success(ReturnValue::Value(Value::Int(3))));
+        assert_eq!(
+            runtime.evaluate("x()"),
+            EvaluationResult::Success(ReturnValue::Value(Value::Int(3)))
+        );
     }
 }

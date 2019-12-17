@@ -1,19 +1,18 @@
-pub mod parser;
 pub mod ast;
-pub mod semantic_analysis;
 pub mod bytecode;
 pub mod codegen;
-pub mod vm;
-pub mod runtime;
+pub mod parser;
 pub mod pretty_print;
+pub mod runtime;
+pub mod semantic_analysis;
+pub mod vm;
 
 use std::io::{self, Write};
 
+use pretty_print::pretty_print;
 use runtime::{EvaluationResult, Runtime};
 use vm::ReturnValue;
-use pretty_print::{pretty_print};
 
-    
 fn main() {
     let mut runtime = Runtime::new();
     loop {

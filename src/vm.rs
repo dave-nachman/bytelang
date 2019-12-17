@@ -94,7 +94,6 @@ impl VM {
                         ));
                     }
                 }
-                
             }
             Instruction::Sub => {
                 let _ = self.data_stack.pop().unwrap();
@@ -120,17 +119,16 @@ impl VM {
 
             &Instruction::Call => {
                 let f = self.data_stack.pop().unwrap();
-                
+
                 if let Value::Function(instructions, heap, symbol_table) = f {
                     let mut vm = VM::from(heap, symbol_table);
                     let result = vm.run(instructions);
 
                     if let Result::Ok(ReturnValue::Value(v)) = result {
                         self.data_stack.push(v);
-                    } 
+                    }
 
                     self.merge(vm);
-                
                 }
             }
         }
