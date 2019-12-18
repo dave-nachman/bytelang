@@ -146,6 +146,7 @@ impl VM {
             &Instruction::MakeFunction(ref function_stack) => {
                 let function = Value::Function(
                     function_stack.clone(),
+                    // TODO: consider implementation without cloning the heap and symbol tables
                     self.heap.clone(),
                     self.symbol_table.clone(),
                 );
