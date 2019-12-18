@@ -9,41 +9,43 @@ fn generate_from_node(node: &Expr) -> Vec<Instruction> {
             Value::Int(ref v) => code.push(Instruction::Push(bytecode::Value::Int(*v))),
             Value::Float(ref v) => code.push(Instruction::Push(bytecode::Value::Float(*v))),
             Value::Bool(ref v) => code.push(Instruction::Push(bytecode::Value::Bool(*v))),
+
+            // string is stored in the heap
             Value::String(ref v) => {
                 let as_bytes = v.as_bytes();
                 code.push(Instruction::AssignAndPush(as_bytes.to_vec()));
             }
         },
         Expr::BinaryOp(ref a, Operator::Add, ref b) => {
-            code.extend(generate_from_node(a.as_ref()));
-            code.extend(generate_from_node(b.as_ref()));
+            code.extend(generate_from_node(a));
+            code.extend(generate_from_node(b));
             code.push(Instruction::Add)
         }
         Expr::BinaryOp(ref a, Operator::Sub, ref b) => {
-            code.extend(generate_from_node(a.as_ref()));
-            code.extend(generate_from_node(b.as_ref()));
+            code.extend(generate_from_node(a));
+            code.extend(generate_from_node(b));
             code.push(Instruction::Sub)
         }
         Expr::BinaryOp(ref a, Operator::Div, ref b) => {
-            code.extend(generate_from_node(a.as_ref()));
-            code.extend(generate_from_node(b.as_ref()));
+            code.extend(generate_from_node(a));
+            code.extend(generate_from_node(b));
             code.push(Instruction::Div)
         }
         Expr::BinaryOp(ref a, Operator::Mul, ref b) => {
-            code.extend(generate_from_node(a.as_ref()));
-            code.extend(generate_from_node(b.as_ref()));
+            code.extend(generate_from_node(a));
+            code.extend(generate_from_node(b));
             code.push(Instruction::Mul)
         }
         Expr::LetAssignment(ref ident, ref expr) => {
-            code.extend(generate_from_node(expr.as_ref()));
+            code.extend(generate_from_node(expr));
             code.push(Instruction::SetVar(ident.value.clone()))
         }
         Expr::ConstAssignment(ref ident, ref expr) => {
-            code.extend(generate_from_node(expr.as_ref()));
+            code.extend(generate_from_node(expr));
             code.push(Instruction::SetVar(ident.value.clone()))
         }
         Expr::Assignment(ref ident, ref expr) => {
-            code.extend(generate_from_node(expr.as_ref()));
+            code.extend(generate_from_node(expr));
             code.push(Instruction::SetVar(ident.value.clone()))
         }
         Expr::Identifier(ref ident) => code.push(Instruction::Lookup(ident.value.clone())),
