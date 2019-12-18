@@ -134,13 +134,15 @@ impl Analyzer {
                 results.append(self.analyze_expr(b));
             }
             Expr::Function(params, body) => {
-                let mut analyzer = self.clone();
-                analyzer.symbol_table.table.extend(
+                let mut fn_analyzer = self.clone();
+
+                // add params to symbol table
+                fn_analyzer.symbol_table.table.extend(
                     params
                     .iter()
                     .map(|param| (param.value.clone(), Type::Const)));
 
-                let fn_results = analyzer.analyze(body);
+                let fn_results = fn_analyzer.analyze(body);
                 results.append(fn_results);
             }
 
