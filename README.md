@@ -1,6 +1,6 @@
 # bytelang
 
-Bytelang is a WIP implementation of a dynamically typed programming language in Rust that is compiled to bytecode and run on a virtual machine.
+Bytelang is a WIP implementation of a dynamically typed programming language in Rust that is compiled to bytecode and run on a stack-based virtual machine.
 
 I wrote this as an exercise in writing a bytecode-based interpreter, and also as an opportunity to write something in Rust.
 

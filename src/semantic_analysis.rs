@@ -15,9 +15,7 @@ pub struct SymbolTable {
 
 impl SymbolTable {
     pub fn new() -> SymbolTable {
-        SymbolTable {
-            table: HashMap::new(),
-        }
+        SymbolTable::default()
     }
 }
 
