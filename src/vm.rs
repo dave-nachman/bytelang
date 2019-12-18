@@ -176,7 +176,10 @@ impl VM {
 
     pub fn run(&mut self, code_stack: Vec<Instruction>) -> Result<ReturnValue, EvaluationError> {
         self.code_stack = code_stack;
+
+        // TODO: move to cli argument
         let debug = true;
+
         let mut error: Option<EvaluationError> = None;
         loop {
             if self.code_stack.is_empty() {
