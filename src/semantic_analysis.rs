@@ -144,13 +144,15 @@ impl Analyzer {
                 results.append(fn_results);
             }
 
-            Expr::CallFunction(ref ident, ref exprs) => {
+            Expr::CallFunction(ref ident, ref arg_exprs) => {
                 let expected_len = self.function_arity.get(&ident.value).unwrap();
-                if exprs.len() != *expected_len {
+                if arg_exprs.len() != *expected_len {
                     results
                         .errors
                         .push(AnalysisError::FunctionCallWithIncorrectArity(ident.clone()))
                 }
+
+                results.append(self.analyze(arg_exprs));
             }
         }
         results
