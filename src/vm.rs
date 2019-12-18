@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::str;
 
 use bytecode::{Heap, Instruction, SymbolTable, Value};
+use pretty_print::pretty_print;
 
 #[derive(Debug, PartialEq)]
 pub enum EvaluationError {
@@ -87,25 +88,59 @@ impl VM {
                 match (a, b) {
                     (Value::Int(x), Value::Int(y)) => self.data_stack.push(Value::Int(x + y)),
                     (Value::Float(x), Value::Float(y)) => self.data_stack.push(Value::Float(x + y)),
-
-                    _ => {
+                    (Value::Int(x), Value::Float(y)) => self.data_stack.push(Value::Float(f64::from(x) + y)),
+                    (Value::Float(x), Value::Int(y)) => self.data_stack.push(Value::Float(x + f64::from(y))), 
+                    (x, y) => {
                         error = Some(EvaluationError::InvalidOperation(
-                            "Can't add A and B".to_string(),
+                            format!("Can't add {} and {}", pretty_print(&x), pretty_print(&y)),
                         ));
                     }
                 }
             }
             Instruction::Sub => {
-                let _ = self.data_stack.pop().unwrap();
-                let _ = self.data_stack.pop().unwrap();
+                let a = self.data_stack.pop().unwrap();
+                let b = self.data_stack.pop().unwrap();
+                match (a, b) {
+                    (Value::Int(x), Value::Int(y)) => self.data_stack.push(Value::Int(x - y)),
+                    (Value::Float(x), Value::Float(y)) => self.data_stack.push(Value::Float(x - y)),
+                    (Value::Int(x), Value::Float(y)) => self.data_stack.push(Value::Float(f64::from(x) - y)),
+                    (Value::Float(x), Value::Int(y)) => self.data_stack.push(Value::Float(x - f64::from(y))), 
+                    (x, y) => {
+                        error = Some(EvaluationError::InvalidOperation(
+                            format!("Can't subtract {} and {}", pretty_print(&x), pretty_print(&y)),
+                        ));
+                    }
+                }
             }
             Instruction::Mul => {
-                let _ = self.data_stack.pop().unwrap();
-                let _ = self.data_stack.pop().unwrap();
+                let a = self.data_stack.pop().unwrap();
+                let b = self.data_stack.pop().unwrap();
+                match (a, b) {
+                    (Value::Int(x), Value::Int(y)) => self.data_stack.push(Value::Int(x * y)),
+                    (Value::Float(x), Value::Float(y)) => self.data_stack.push(Value::Float(x * y)),
+                    (Value::Int(x), Value::Float(y)) => self.data_stack.push(Value::Float(f64::from(x) * y)),
+                    (Value::Float(x), Value::Int(y)) => self.data_stack.push(Value::Float(x * f64::from(y))), 
+                    (x, y) => {
+                        error = Some(EvaluationError::InvalidOperation(
+                            format!("Can't multiply {} and {}", pretty_print(&x), pretty_print(&y)),
+                        ));
+                    }
+                }
             }
             Instruction::Div => {
-                let _ = self.data_stack.pop().unwrap();
-                let _ = self.data_stack.pop().unwrap();
+                let a = self.data_stack.pop().unwrap();
+                let b = self.data_stack.pop().unwrap();
+                match (a, b) {
+                    (Value::Int(x), Value::Int(y)) => self.data_stack.push(Value::Int(x / y)),
+                    (Value::Float(x), Value::Float(y)) => self.data_stack.push(Value::Float(x / y)),
+                    (Value::Int(x), Value::Float(y)) => self.data_stack.push(Value::Float(f64::from(x) / y)),
+                    (Value::Float(x), Value::Int(y)) => self.data_stack.push(Value::Float(x / f64::from(y))), 
+                    (x, y) => {
+                        error = Some(EvaluationError::InvalidOperation(
+                            format!("Can't divide {} and {}", pretty_print(&x), pretty_print(&y)),
+                        ));
+                    }
+                }
             }
 
             &Instruction::MakeFunction(ref function_stack) => {

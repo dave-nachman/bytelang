@@ -2,13 +2,13 @@ use std::collections::HashMap;
 
 use ast::{Expr, Identifier};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Type {
     Let,
     Const,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SymbolTable {
     table: HashMap<String, Type>,
 }
@@ -24,6 +24,7 @@ impl SymbolTable {
 #[derive(Debug, Clone, PartialEq)]
 pub enum AnalysisError {
     UnboundIdentifier(Identifier),
+    RedeclaringIdentifier(Identifier),
     ReassigningConst(Identifier),
     FunctionCallWithIncorrectArity(Identifier),
 }
@@ -53,7 +54,7 @@ impl AnalysisResults {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Analyzer {
     symbol_table: SymbolTable,
     function_arity: HashMap<String, usize>,
@@ -101,6 +102,12 @@ impl Analyzer {
                 results.append(self.analyze_expr(rhs))
             }
             Expr::LetAssignment(ref ident, ref rhs) => {
+                if self.symbol_table.table.contains_key(&ident.value) {
+                    results
+                        .errors
+                        .push(AnalysisError::RedeclaringIdentifier(ident.clone()))
+                }
+
                 self.symbol_table
                     .table
                     .insert(ident.value.clone(), Type::Let);
@@ -113,7 +120,7 @@ impl Analyzer {
                 if self.symbol_table.table.contains_key(&ident.value) {
                     results
                         .errors
-                        .push(AnalysisError::ReassigningConst(ident.clone()))
+                        .push(AnalysisError::RedeclaringIdentifier(ident.clone()))
                 }
                 self.symbol_table
                     .table
@@ -126,7 +133,16 @@ impl Analyzer {
                 results.append(self.analyze_expr(a));
                 results.append(self.analyze_expr(b));
             }
-            Expr::Function(_, _) => {}
+            Expr::Function(params, body) => {
+                let mut analyzer = self.clone();
+                analyzer.symbol_table.table.extend(
+                    params
+                    .iter()
+                    .map(|param| (param.value.clone(), Type::Const)));
+
+                let fn_results = analyzer.analyze(body);
+                results.append(fn_results);
+            }
 
             Expr::CallFunction(ref ident, ref exprs) => {
                 let expected_len = self.function_arity.get(&ident.value).unwrap();
@@ -140,7 +156,7 @@ impl Analyzer {
         results
     }
 
-    pub fn analyze(&mut self, exprs: &Vec<Expr>) -> AnalysisResults {
+    pub fn analyze(&mut self, exprs: &[Expr]) -> AnalysisResults {
         let mut results = AnalysisResults::new();
         for expr in exprs {
             results.append(self.analyze_expr(&expr))

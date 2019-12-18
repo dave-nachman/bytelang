@@ -17,7 +17,7 @@ pub Expr: Box<Expr> = {
     String
 };
 
-ExprOp: Operator = { // (3)
+ExprOp: Operator = {
     "+" => Operator::Add,
     "-" => Operator::Sub,
 };
@@ -90,7 +90,6 @@ IdentifierExprUnboxed: Expr  = {
     Identifier => Expr::Identifier(<>)
 };
 
-
 Identifier: Identifier  = {
-    r"([A-Z]|[a-z])+" => Identifier::new(String::from_str(<>).unwrap())
+    r"[A-z]([A-z|0-9|_])*" => Identifier::new(String::from_str(<>).unwrap())
 };
