@@ -74,6 +74,7 @@ impl VM {
                     let value = &self.heap[location];
                     self.data_stack.push(value.clone());
                 }
+                // we'd expect that semantic analyzer to catch these errors, so we'd never expect this error
                 None => error = Some(EvaluationError::MissingVariable(ident.to_string())),
             },
             Instruction::SetVar(ref ident) => {
